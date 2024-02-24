@@ -1,0 +1,18 @@
+<% layout('/layouts/boilerplate') -%>
+<body>
+    <form method="POST" action="/listings/<%=listing.id%>?_method=PUT">
+        <h3>Edit listing</h3>
+        <input type="text" name="title" value="<%=listing.title%>">
+        <br><br>
+        <textarea name="description" type = "text" > <%= listing.description %> </textarea>
+        <br><br>
+        <input type="text" name="image" value="<%=listing.image%>">
+        <br><br>
+        <input type="text" name="price" value="<%=listing.price%>">
+        <br><br>
+        <input type="text" name="location" value="<%=listing.location%>">
+        <br><br>
+        <input type="text" name="country" value="<%=listing.country%>" >
+        <button>ADD</button>
+    </form>
+</body>
