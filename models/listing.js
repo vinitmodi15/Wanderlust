@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 const  listingSchema = new Schema({
     title:{
         type:String,
-        rewuired:true,
+        required:true,
     },
     description:String,
     image:{
@@ -19,7 +19,10 @@ const  listingSchema = new Schema({
         // here v is the image value comming from the user if send by the user then it will display that image or the default image will be displayed
     },
     price:Number,
-    location:String,
+    location: {
+        type: [String], // Array of strings
+        required: true
+    },
     country:String,
 });
 
