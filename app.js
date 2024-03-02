@@ -95,19 +95,11 @@ app.post("/listings",validateListing ,wrapAsync(async(req,res)=>{
     // if(result.error){
     //     throw new ExpressError(400,result.error);
     // }
-    // let newListing = new Listing(req.body.listing);//req.body se humne jb data liya and console p kra to listings key m data aaraha hai to humne kiya ki listings ko .opertor se uss key ki value ko acccess kiay
+    let newListing = new Listing(req.body.listing);//req.body se humne jb data liya and console p kra to listings key m data aaraha hai to humne kiya ki listings ko .opertor se uss key ki value ko acccess kiay
 
-    // await newListing.save();
-    // console.log(newListing);
-    // res.redirect("/listings")
-
-    let {id} = req.params;
-    let url = req.body.listing.image;
-    let filename = "random";
-   req.body.listing.image = {url,filename};
-    let listing = req.body.listing;
-   await Listing.findByIdAndUpdate(id,listing);
-   res.redirect("/listings");
+    await newListing.save();
+    console.log(newListing);
+    res.redirect("/listings")
 }))
 
 
