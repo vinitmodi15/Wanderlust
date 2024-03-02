@@ -95,11 +95,19 @@ app.post("/listings",validateListing ,wrapAsync(async(req,res)=>{
     // if(result.error){
     //     throw new ExpressError(400,result.error);
     // }
-    let newListing = new Listing(req.body.listing);//req.body se humne jb data liya and console p kra to listings key m data aaraha hai to humne kiya ki listings ko .opertor se uss key ki value ko acccess kiay
+    // let newListing = new Listing(req.body.listing);//req.body se humne jb data liya and console p kra to listings key m data aaraha hai to humne kiya ki listings ko .opertor se uss key ki value ko acccess kiay
 
-    await newListing.save();
-    console.log(newListing);
-    res.redirect("/listings")
+    // await newListing.save();
+    // console.log(newListing);
+    // res.redirect("/listings")
+
+    let {id} = req.params;
+    let url = req.body.listing.image;
+    let filename = "random";
+   req.body.listing.image = {url,filename};
+    let listing = req.body.listing;
+   await Listing.findByIdAndUpdate(id,listing);
+   res.redirect("/listings");
 }))
 
 
@@ -113,15 +121,28 @@ app.get("/listings/:id/edit",wrapAsync(async (req,res)=>{
 }))
 
 //update route
-app.put("/listings/:id",wrapAsync(async (req,res)=>{
-    if(!req.body.listing){
-        throw new ExpressError(400,"PLease send valid data"); 
-    }
+//update route
+app.put("/listings/:id",validateListing,wrapAsync(async (req,res)=>{
     let {id} = req.params;
-    console.log(req.body);
-    await Listing.findByIdAndUpdate(id,{...req.body.lis});
+     let url = req.body.listing.image;
+     let filename = "random";
+    req.body.listing.image = {url,filename};
+     let listing = req.body.listing;
+    await Listing.findByIdAndUpdate(id,listing);
     res.redirect("/listings");
 }))
+
+
+
+// app.put("/listings/:id",validateListing ,wrapAsync(async (req,res)=>{
+//     // if(!req.body.listing){
+//     //     throw new ExpressError(400,"PLease send valid data"); 
+//     // }
+//     let {id} = req.params;
+//     console.log(req.body);
+//     await Listing.findByIdAndUpdate(id,{...req.body.listing});
+//     res.redirect("/listings");
+// }))
 //delete route
 app.delete("/listings/:id",wrapAsync(async (req,res)=>{
     let {id} = req.params;
@@ -131,8 +152,8 @@ app.delete("/listings/:id",wrapAsync(async (req,res)=>{
 }))
 
 app.all("*",(req,res,next)=>{
-    // next(new ExpressError(404,"Page not found"));
-    throw new ExpressError(404,"Page not found")  //both will work bcoz this is not async process
+    next(new ExpressError(404,"Page not found"));
+    // throw new ExpressError(404,"Page not found")  //both will work bcoz this is not async process
 })
 
 app.use((err,req,res,next)=>{
@@ -140,6 +161,7 @@ app.use((err,req,res,next)=>{
     let {statusCode = 500,message="Something went wrong"} = err;
     // res.status(statusCode).send(message);
     // res.send("something went wrong")
+    console.log(err);
     res.status(statusCode).render("listings/error.ejs",{err});
 })
 app.listen(8080, () => {
