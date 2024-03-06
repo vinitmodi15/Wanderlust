@@ -8,7 +8,8 @@ const { count } = require("console");
 const ejsMate = require("ejs-mate");
 const wrapAsync = require("./utils/wrapAsync.js")
 const ExpressError = require("./utils/ExpressError.js")
-const listingSchema = require("./JoiSchema.js");
+const { listingSchema, reviewSchema } = require("./JoiSchema.js");
+const Review = require("./models/Review.js");
 
 app.use(express.urlencoded({extended:true}));
 app.set("views engine","ejs");
@@ -31,6 +32,16 @@ async function main() {
 
 const validateListing = (req,res,next)=>{
     let {error} = listingSchema.validate(req.body);
+    if(error){
+        let errMsg = error.details.map((el)=>el.message).join(",");
+        throw new ExpressError(400,errMsg);
+    }else {
+        next();
+    }
+}
+
+const validateReview = (req,res,next)=>{
+    let {error} = reviewSchema.validate(req.body);
     if(error){
         let errMsg = error.details.map((el)=>el.message).join(",");
         throw new ExpressError(400,errMsg);
@@ -63,44 +74,50 @@ app.get("/listings/new",(req,res)=>{
 // SHOW ROUTE 
 app.get("/listings/:id",wrapAsync(async (req,res)=> {
     let {id} = req.params;
-    const listing = await Listing.findById(id);
+    const listing = await Listing.findById(id).populate("reviews");
     // res.send("showing");
     res.render("listings/show.ejs",{listing})
     // console.log(listing);
 }));
 
-app.post("/listings",validateListing ,wrapAsync(async(req,res)=>{
-    // let {title,description,image,price,location,country} = req.body;
-    // let newListing = new Listing({
-    //     title:title,
-    //     description:description,
-    //     image:image,
-    //     price:price,
-    //     location:location,
-    //     country:country,
-    // });
+// app.post("/listings",valida  teListing ,wrapAsync(async(req,res)=>{
+//     // let {title,description,image,price,location,country} = req.body;
+//     // let newListing = new Listing({
+//     //     title:title,
+//     //     description:description,
+//     //     image:image,
+//     //     price:price,
+//     //     location:location,
+//     //     country:country,
+//     // });
 
-    // this was the first way to store the data and i am simply using the second tay that is more ssimpler
+//     // this was the first way to store the data and i am simply using the second tay that is more ssimpler
 
-    //second way is that take all the data rom the req.body and save that in variable and pass with the variable to model 
+//     //second way is that take all the data rom the req.body and save that in variable and pass with the variable to model 
    
-    // let listing = req.body;
-    // newlisting = await new Listing(listing)
-    // newListing.save()
-    // if(!req.body.listing){
-    //     throw new ExpressError(400,"PLease send valid data"); 
-    // }
+//     // let listing = req.body;
+//     // newlisting = await new Listing(listing)
+//     // newListing.save()
+//     // if(!req.body.listing){
+//     //     throw new ExpressError(400,"PLease send valid data"); 
+//     // }
     // let result = listingSchema.validate(req.body);
-    // console.log(result);
-    // if(result.error){
-    //     throw new ExpressError(400,result.error);
-    // }
-    let newListing = new Listing(req.body.listing);//req.body se humne jb data liya and console p kra to listings key m data aaraha hai to humne kiya ki listings ko .opertor se uss key ki value ko acccess kiay
+//     // console.log(result);
+//     // if(result.error){
+//     //     throw new ExpressError(400,result.error);
+//     // }
+//     let newListing = new Listing(req.body.listing);//req.body se humne jb data liya and console p kra to listings key m data aaraha hai to humne kiya ki listings ko .opertor se uss key ki value ko acccess kiay
 
+//     await newListing.save();
+//     console.log(newListing);
+//     res.redirect("/listings")
+// }))
+app.post("/listings", wrapAsync(async (req, res) => {
+    let newListing = new Listing(req.body.listing);
     await newListing.save();
     console.log(newListing);
-    res.redirect("/listings")
-}))
+    res.redirect("/listings");
+}));
 
 
 //edit route
@@ -143,6 +160,27 @@ app.delete("/listings/:id",wrapAsync(async (req,res)=>{
     res.redirect("/listings");
 }))
 
+//Review 
+//POST req
+app.post("/listings/:id/reviews", async (req, res) => {
+        let { id } = req.params;
+        let listing = await Listing.findById(id);
+        let newReview = new Review(req.body.review); // Assuming the request body contains review data directly
+        // console.log(req.body.review.comment);
+
+        await newReview.save();
+        listing.reviews.push(newReview);
+        await listing.save();
+        console.log("Review saved");
+        res.send("Review sent");
+});
+
+
+
+
+
+
+
 app.all("*",(req,res,next)=>{
     next(new ExpressError(404,"Page not found"));
     // throw new ExpressError(404,"Page not found")  //both will work bcoz this is not async process
@@ -153,7 +191,7 @@ app.use((err,req,res,next)=>{
     let {statusCode = 500,message="Something went wrong"} = err;
     // res.status(statusCode).send(message);
     // res.send("something went wrong")
-    console.log(err);
+        // console.log(err);
     res.status(statusCode).render("listings/error.ejs",{err});
 })
 app.listen(8080, () => {
