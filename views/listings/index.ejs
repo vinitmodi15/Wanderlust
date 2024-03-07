@@ -3,10 +3,10 @@
     <!-- <form method="GET" action="/listings/new">
         <button>Create new listing</button>
     </form> -->
-    <div class="row row-cols-lg-3 row-cols-md-2">
+    <div class="row row-cols-lg-3 row-cols-md-2 rwo-cols-sm-1">
         <% for(let listings of alllistings){ %>
           <a href="/listings/<%= listings.id%>" class="listing-link">
-            <div class="card">
+            <div class="card col listing-card">
                 <img src="<%= listings.image.url%>" class="card-img-top" alt="listing_image"style="height: 20rem;">
                 <div class="card-img-overlay"> </div>
                 <div class="card-body">

@@ -18,7 +18,8 @@ app.use(methodOverride("_method"));
 app.engine('ejs',ejsMate);
 app.use(express.static(path.join(__dirname,"/public")))
 
-
+const listings = require("./routes/listing.js");
+app.use("/listings",listings)
 main().then(() => {
     console.log("connected to the DB");
 }).catch((err) => {
@@ -162,20 +163,30 @@ app.delete("/listings/:id",wrapAsync(async (req,res)=>{
 
 //Review 
 //POST req
-app.post("/listings/:id/reviews", async (req, res) => {
+app.post("/listings/:id/reviews",validateReview,wrapAsync(async (req, res) => {
         let { id } = req.params;
         let listing = await Listing.findById(id);
+        // console.log("hi")
         let newReview = new Review(req.body.review); // Assuming the request body contains review data directly
         // console.log(req.body.review.comment);
+        // console.log("hi")
 
         await newReview.save();
+        // console.log(newReview);
         listing.reviews.push(newReview);
         await listing.save();
-        console.log("Review saved");
-        res.send("Review sent");
-});
+        // console.log("Review saved");
+        // res.send("Review sent");
+        res.redirect(`/listings/${id}`) // or   res.redirect(`/listings/${listings.id}`)
+}));
 
-
+//DELETE Review REQUEST
+app.delete("/listings/:id/reviews/:reviewId",wrapAsync(async(req,res)=>{
+    let {id,reviewId} = req.params;
+    await Listing.findByIdAndUpdate(id,{$pull:{reviews:reviewId}})
+    await Review.findByIdAndDelete(reviewId);
+    res.redirect(`/listings/${id}`);
+}))
 
 
 
