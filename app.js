@@ -10,6 +10,15 @@ const wrapAsync = require("./utils/wrapAsync.js")
 const ExpressError = require("./utils/ExpressError.js")
 const { listingSchema, reviewSchema } = require("./JoiSchema.js");
 const Review = require("./models/Review.js");
+const session = require("express-session");
+const flash = require("connect-flash")
+const passport = require("passport");
+const LocalStrategy = require("passport-local");
+const User = require("./models/user.js");
+
+const listingsRouter = require("./routes/listing.js")
+const reviewRouter = require("./routes/review.js")
+const userRouter = require("./routes/user.js");
 
 app.use(express.urlencoded({extended:true}));
 app.set("views engine","ejs");
@@ -18,8 +27,39 @@ app.use(methodOverride("_method"));
 app.engine('ejs',ejsMate);
 app.use(express.static(path.join(__dirname,"/public")))
 
-const listings = require("./routes/listing.js");
-app.use("/listings",listings)
+const sessionOption = {
+    secret:"mysecretcode",
+    resave:false,
+    saveUninitialized:true,
+    cookies:{
+        expires: Date.now() + 7 * 24 * 60 * 60,
+        maxAge: 7 * 24 * 60 * 60,
+        httpOnly : true,
+    }
+}
+
+app.use(session(sessionOption));
+app.use(flash());
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate))
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+
+app.use((req,res,next)=>{
+    res.locals.success = req.flash("success");
+    res.locals.error = req.flash("error");
+    next();
+})
+
+
+//router object one 
+app.use("/listings",listingsRouter);
+app.use("/listings/:id/reviews",reviewRouter);
+app.use("/",userRouter);
+
+
 main().then(() => {
     console.log("connected to the DB");
 }).catch((err) => {
@@ -30,56 +70,41 @@ async function main() {
     await mongoose.connect('mongodb://127.0.0.1:27017/wanderlust');
 }
 
+// app.get("/demouser",async(req,res)=>{
+//     let fakeUser = new User({
+//         email:"vinitjodhpur2@gmail.com",
+//         username:"delta_student",
+//     })
+//     let registeredUser = await User.register(fakeUser,"password");
+//     res.send(registeredUser);
+// })
+// app.all("*",(req,res,next)=>{
+//     next(new ExpressError(404,"Page not found"));
+//     // throw new ExpressError(404,"Page not found")  //both will work bcoz this is not async process
+// })
 
-const validateListing = (req,res,next)=>{
-    let {error} = listingSchema.validate(req.body);
-    if(error){
-        let errMsg = error.details.map((el)=>el.message).join(",");
-        throw new ExpressError(400,errMsg);
-    }else {
-        next();
-    }
-}
+app.use((err,req,res,next)=>{
 
-const validateReview = (req,res,next)=>{
-    let {error} = reviewSchema.validate(req.body);
-    if(error){
-        let errMsg = error.details.map((el)=>el.message).join(",");
-        throw new ExpressError(400,errMsg);
-    }else {
-        next();
-    }
-}
-app.get("/", (req, res) => {
-    res.send("working");
+    let {statusCode = 500,message="Something went wrong"} = err;
+    // res.status(statusCode).send(message);
+    // res.send("something went wrong")
+        // console.log(err);
+    res.status(statusCode).render("listings/error.ejs",{err});
 })
-
-//INDEX ROUTE
-app.get("/listings", wrapAsync(async (req, res) => {
-    try {
-        const alllistings = await Listing.find({});
-        // console.log(alllistings);
-        // res.send(listings); // Sending the listings retrieved from the database
-        res.render("listings/index.ejs",{alllistings});
-    } catch (error) {
-        console.error(error);
-        res.status(500).send("Error fetching data"); // Sending an error response if there's an issue
-    }
-}))
- 
-//NEW ROUTE
-app.get("/listings/new",(req,res)=>{
-    res.render("listings/newform.ejs");
+app.listen(8080, () => {
+    console.log("listening on port 8080");
+    
 })
+                                          
 
-// SHOW ROUTE 
-app.get("/listings/:id",wrapAsync(async (req,res)=> {
-    let {id} = req.params;
-    const listing = await Listing.findById(id).populate("reviews");
-    // res.send("showing");
-    res.render("listings/show.ejs",{listing})
-    // console.log(listing);
-}));
+
+
+
+
+
+
+
+
 
 // app.post("/listings",valida  teListing ,wrapAsync(async(req,res)=>{
 //     // let {title,description,image,price,location,country} = req.body;
@@ -113,35 +138,6 @@ app.get("/listings/:id",wrapAsync(async (req,res)=> {
 //     console.log(newListing);
 //     res.redirect("/listings")
 // }))
-app.post("/listings", wrapAsync(async (req, res) => {
-    let newListing = new Listing(req.body.listing);
-    await newListing.save();
-    console.log(newListing);
-    res.redirect("/listings");
-}));
-
-
-//edit route
-app.get("/listings/:id/edit",wrapAsync(async (req,res)=>{
-    let {id} = req.params;
-    let listing = await Listing.findById(id);
-    // console.log(listing);
-    res.render("listings/edit.ejs",{listing});
-
-}))
-
-//update route
-//update route
-app.put("/listings/:id",validateListing,wrapAsync(async (req,res)=>{
-    let {id} = req.params;
-     let url = req.body.listing.image;
-     let filename = "random";
-    req.body.listing.image = {url,filename};
-     let listing = req.body.listing;
-    await Listing.findByIdAndUpdate(id,listing);
-    res.redirect("/listings");
-}))
-
 
 
 // app.put("/listings/:id",validateListing ,wrapAsync(async (req,res)=>{
@@ -154,58 +150,3 @@ app.put("/listings/:id",validateListing,wrapAsync(async (req,res)=>{
 //     res.redirect("/listings");
 // }))
 //delete route
-app.delete("/listings/:id",wrapAsync(async (req,res)=>{
-    let {id} = req.params;
-    let deletedlistings = await Listing.findByIdAndDelete(id);
-    console.log(deletedlistings);
-    res.redirect("/listings");
-}))
-
-//Review 
-//POST req
-app.post("/listings/:id/reviews",validateReview,wrapAsync(async (req, res) => {
-        let { id } = req.params;
-        let listing = await Listing.findById(id);
-        // console.log("hi")
-        let newReview = new Review(req.body.review); // Assuming the request body contains review data directly
-        // console.log(req.body.review.comment);
-        // console.log("hi")
-
-        await newReview.save();
-        // console.log(newReview);
-        listing.reviews.push(newReview);
-        await listing.save();
-        // console.log("Review saved");
-        // res.send("Review sent");
-        res.redirect(`/listings/${id}`) // or   res.redirect(`/listings/${listings.id}`)
-}));
-
-//DELETE Review REQUEST
-app.delete("/listings/:id/reviews/:reviewId",wrapAsync(async(req,res)=>{
-    let {id,reviewId} = req.params;
-    await Listing.findByIdAndUpdate(id,{$pull:{reviews:reviewId}})
-    await Review.findByIdAndDelete(reviewId);
-    res.redirect(`/listings/${id}`);
-}))
-
-
-
-
-
-app.all("*",(req,res,next)=>{
-    next(new ExpressError(404,"Page not found"));
-    // throw new ExpressError(404,"Page not found")  //both will work bcoz this is not async process
-})
-
-app.use((err,req,res,next)=>{
-
-    let {statusCode = 500,message="Something went wrong"} = err;
-    // res.status(statusCode).send(message);
-    // res.send("something went wrong")
-        // console.log(err);
-    res.status(statusCode).render("listings/error.ejs",{err});
-})
-app.listen(8080, () => {
-    console.log("listening on port 8080");
-    
-})

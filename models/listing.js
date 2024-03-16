@@ -33,14 +33,22 @@ const  listingSchema = new Schema({
     ]
 });
 
-let Listing = new mongoose.model("listing",listingSchema);
-// Assuming listingSchema is a Mongoose schema
-listingSchema.post('findOneAndDelete', async function(doc, next) {
+listingSchema.post('findOneAndDelete', async function (doc, next) {
     // Accessing the reviews field of the document being deleted
-    let deletedReviews = await Review.deleteMany({ _id: { $in: doc.reviews }});
-    console.log(deletedReviews);
-    console.log("hi");
-    next();
+    try {
+        if (doc && doc.reviews.length > 0) {
+            let deletedReviews = await Review.deleteMany({ _id: { $in: doc.reviews } });
+            console.log(deletedReviews);
+            console.log("hi");
+            next();
+        }
+    }catch(err){
+        console.log(err);
+        next();
+    }
 });
+
+
+let Listing = new mongoose.model("listing", listingSchema);
 
 module.exports = Listing;
