@@ -5,6 +5,7 @@ const wrapAsync = require("../utils/wrapAsync.js")
 const ExpressError = require("../utils/ExpressError.js")
 const { listingSchema, reviewSchema } = require("../JoiSchema.js");
 const flash = require("connect-flash");
+const {isLoggedIn}= require("../middleware.js");
 
 const validateListing = (req,res,next)=>{
     let {error} = listingSchema.validate(req.body);
@@ -21,6 +22,7 @@ router.get("/", wrapAsync(async (req, res) => {
         const alllistings = await Listing.find({});
         // console.log(alllistings);
         // res.send(listings); // Sending the listings retrieved from the database
+        // console.log(req.user);
         res.render("listings/index.ejs",{alllistings});
     } catch (error) {
         console.error(error);
@@ -29,18 +31,8 @@ router.get("/", wrapAsync(async (req, res) => {
 }))
  
 //NEW ROUTE
-router.get("/new",(req,res)=>{
-    try{
-        console.log(req.user);
-    if(!req.isAuthenticated()){
-        req.flash("error","please be logged in first to create new listing");
-        res.redirect("/listings");
-        // res.redirect("/login");
-    }
-    res.render("listings/newform.ejs");
-    } catch(e){
-        console.log(e.message);
-    }
+router.get("/new",isLoggedIn,(req,res)=>{
+        res.render("listings/newform.ejs");
     
 })
 
@@ -58,7 +50,7 @@ router.get("/:id",wrapAsync(async (req,res)=> {
     // console.log(listing);
 }));
 
-router.post("/", wrapAsync(async (req, res) => {
+router.post("/",isLoggedIn, wrapAsync(async (req, res) => {
     let newListing = new Listing(req.body.listing);
     await newListing.save();
     console.log(newListing);
@@ -68,7 +60,7 @@ router.post("/", wrapAsync(async (req, res) => {
 
 
 //edit route
-router.get("/:id/edit",wrapAsync(async (req,res)=>{
+router.get("/:id/edit",isLoggedIn,wrapAsync(async (req,res)=>{
     let {id} = req.params;
     let listing = await Listing.findById(id);
     if(!listing){
@@ -83,7 +75,7 @@ router.get("/:id/edit",wrapAsync(async (req,res)=>{
 
 //update route
 //update route
-router.put("/:id",validateListing,wrapAsync(async (req,res)=>{
+router.put("/:id",isLoggedIn,validateListing,wrapAsync(async (req,res)=>{
     let {id} = req.params;
      let url = req.body.listing.image;
      let filename = "random";
@@ -94,7 +86,7 @@ router.put("/:id",validateListing,wrapAsync(async (req,res)=>{
     res.redirect("/listings");
 }))
 
-router.delete("/:id",wrapAsync(async (req,res)=>{
+router.delete("/:id",isLoggedIn,wrapAsync(async (req,res)=>{
     let {id} = req.params;
     let deletedlistings = await Listing.findByIdAndDelete(id);
     console.log(deletedlistings);

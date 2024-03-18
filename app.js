@@ -42,7 +42,7 @@ app.use(session(sessionOption));
 app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
-passport.use(new LocalStrategy(User.authenticate))
+passport.use(new LocalStrategy(User.authenticate()))
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
@@ -50,6 +50,7 @@ passport.deserializeUser(User.deserializeUser());
 app.use((req,res,next)=>{
     res.locals.success = req.flash("success");
     res.locals.error = req.flash("error");
+    res.locals.currUser = req.user;
     next();
 })
 
@@ -78,10 +79,10 @@ async function main() {
 //     let registeredUser = await User.register(fakeUser,"password");
 //     res.send(registeredUser);
 // })
-// app.all("*",(req,res,next)=>{
-//     next(new ExpressError(404,"Page not found"));
-//     // throw new ExpressError(404,"Page not found")  //both will work bcoz this is not async process
-// })
+app.all("*",(req,res,next)=>{
+    next(new ExpressError(404,"Page not found"));
+    // throw new ExpressError(404,"Page not found")  //both will work bcoz this is not async process
+})
 
 app.use((err,req,res,next)=>{
 
