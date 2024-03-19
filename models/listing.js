@@ -30,6 +30,12 @@ const  listingSchema = new Schema({
             type:Schema.Types.ObjectId,
             ref:"Review",
         }
+    ],
+    owner:[
+        {
+            type:Schema.Types.ObjectId,
+            ref:"User" // collection name
+        }
     ]
 });
 
@@ -39,7 +45,7 @@ listingSchema.post('findOneAndDelete', async function (doc, next) {
         if (doc && doc.reviews.length > 0) {
             let deletedReviews = await Review.deleteMany({ _id: { $in: doc.reviews } });
             console.log(deletedReviews);
-            console.log("hi");
+            // console.log("hi");
             next();
         }
     }catch(err){

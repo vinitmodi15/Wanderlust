@@ -39,12 +39,13 @@ router.get("/new",isLoggedIn,(req,res)=>{
 // SHOW ROUTE 
 router.get("/:id",wrapAsync(async (req,res)=> {
     let {id} = req.params;
-    const listing = await Listing.findById(id).populate("reviews");
+    const listing = await Listing.findById(id).populate("reviews").populate("owner");
     if(!listing){
         req.flash("error","Listing you looking for does not exist");  //yeh apn jab kr rhe hai agr user n listing ko delete krdi and usne 
         // agar url copy kiya va ho and delete krne k baad  m agar vo daale search krne k liye to bada error na aaye isliye yeh flash hojaaye
         res.redirect("/listings")
     }
+    console.log(listing);
     // res.send("showing");
     res.render("listings/show.ejs",{listing})
     // console.log(listing);
@@ -52,6 +53,7 @@ router.get("/:id",wrapAsync(async (req,res)=> {
 
 router.post("/",isLoggedIn, wrapAsync(async (req, res) => {
     let newListing = new Listing(req.body.listing);
+    newListing.owner = req.user._id;
     await newListing.save();
     console.log(newListing);
     req.flash("success","New Listing Created");

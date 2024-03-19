@@ -44,7 +44,7 @@ router.post("/login",saveRedirectUrl,passport.authenticate('local', { failureRed
     req.flash("success", "Welcome back to Wanderlust");
     // console.log("hi");
     // console.log(req.body);
-    res.redirect(req.locals.redirectUrl);
+    res.redirect(res.locals.redirectUrl || "/listings"); //yeh idhr isliye kyoki jab login krta hai button se login 
     // res.send("welcome to the wanderlust");
 });
 router.get("/logout",(req,res,next)=>{

@@ -1,8 +1,9 @@
-module.exports.isLoggedIn = (req,res,next)=>{
+const isLoggedIn = (req,res,next)=>{
     // console.log(req.path,"..",req.originalUrl);  
     if(!req.isAuthenticated()){
         //redirect url
-        req.session.redirectUrl = req.OriginalUrl;
+        req.session.redirectUrl = req.originalUrl;
+        console.log(req.originalUrl)
         req.flash("error","please be logged in first to create new listing");
         // res.redirect("/listings");
         res.redirect("/login");
@@ -10,10 +11,12 @@ module.exports.isLoggedIn = (req,res,next)=>{
     next();
 }
 
-module.exports.saveRedirectUrl = (req,res,next)=>{
-    console.log(req.originalUrl);
+const saveRedirectUrl = (req,res,next)=>{
+    console.log(req.session.redirectUrl);
     if(req.session.redirectUrl){
         res.locals.redirectUrl = req.session.redirectUrl;
     }
     next();
 }
+
+module.exports = {isLoggedIn,saveRedirectUrl};
