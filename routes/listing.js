@@ -3,97 +3,33 @@ const router = express.Router({mergeParams:true});
 const Listing = require("../models/listing.js");
 const wrapAsync = require("../utils/wrapAsync.js")
 const ExpressError = require("../utils/ExpressError.js")
-const { listingSchema, reviewSchema } = require("../JoiSchema.js");
 const flash = require("connect-flash");
-const {isLoggedIn}= require("../middleware.js");
+const {isLoggedIn,saveRedirectUrl,isOwner,validateListing,validateReview}= require("../middleware.js");
+const listingController = require("../controller/listing.js")
 
-const validateListing = (req,res,next)=>{
-    let {error} = listingSchema.validate(req.body);
-    if(error){
-        let errMsg = error.details.map((el)=>el.message).join(",");
-        throw new ExpressError(400,errMsg);
-    }else {
-        next();
-    }
-}
 
-router.get("/", wrapAsync(async (req, res) => {
-    try {
-        const alllistings = await Listing.find({});
-        // console.log(alllistings);
-        // res.send(listings); // Sending the listings retrieved from the database
-        // console.log(req.user);
-        res.render("listings/index.ejs",{alllistings});
-    } catch (error) {
-        console.error(error);
-        res.status(500).send("Error fetching data"); // Sending an error response if there's an issue
-    }
-}))
+router.get("/", wrapAsync(listingController.index))
  
 //NEW ROUTE
-router.get("/new",isLoggedIn,(req,res)=>{
-        res.render("listings/newform.ejs");
-    
-})
+router.get("/new",isLoggedIn,listingController.renderNewForm)
 
 // SHOW ROUTE 
-router.get("/:id",wrapAsync(async (req,res)=> {
-    let {id} = req.params;
-    const listing = await Listing.findById(id).populate("reviews").populate("owner");
-    if(!listing){
-        req.flash("error","Listing you looking for does not exist");  //yeh apn jab kr rhe hai agr user n listing ko delete krdi and usne 
-        // agar url copy kiya va ho and delete krne k baad  m agar vo daale search krne k liye to bada error na aaye isliye yeh flash hojaaye
-        res.redirect("/listings")
-    }
-    console.log(listing);
-    // res.send("showing");
-    res.render("listings/show.ejs",{listing})
-    // console.log(listing);
-}));
-
-router.post("/",isLoggedIn, wrapAsync(async (req, res) => {
-    let newListing = new Listing(req.body.listing);
-    newListing.owner = req.user._id;
-    await newListing.save();
-    console.log(newListing);
-    req.flash("success","New Listing Created");
-    res.redirect("/listings");
-}));
+router.get("/:id",wrapAsync(listingController.showListings));
 
 
-//edit route
-router.get("/:id/edit",isLoggedIn,wrapAsync(async (req,res)=>{
-    let {id} = req.params;
-    let listing = await Listing.findById(id);
-    if(!listing){
-        req.flash("error","Listing you looking for does not exist");  //yeh apn jab kr rhe hai agr user n listing ko delete krdi and usne 
-        // agar url copy kiya va ho and delete krne k baad  m agar vo daale search krne k liye to bada error na aaye isliye yeh flash hojaaye
-        res.redirect("/listings")
-    }
-    // console.log(listing);
-    res.render("listings/edit.ejs",{listing});
+//UPDATE ROUTE
+router.post("/",isLoggedIn, wrapAsync(listingController.createListings));
 
-}))
 
-//update route
-//update route
-router.put("/:id",isLoggedIn,validateListing,wrapAsync(async (req,res)=>{
-    let {id} = req.params;
-     let url = req.body.listing.image;
-     let filename = "random";
-    req.body.listing.image = {url,filename};
-     let listing = req.body.listing;
-    await Listing.findByIdAndUpdate(id,listing);
-    req.flash("success","Listing Edited Successfully");
-    res.redirect("/listings");
-}))
+//EDIT ROUTE
+router.get("/:id/edit",isLoggedIn,isOwner,wrapAsync(listingController.renderEditForm))
 
-router.delete("/:id",isLoggedIn,wrapAsync(async (req,res)=>{
-    let {id} = req.params;
-    let deletedlistings = await Listing.findByIdAndDelete(id);
-    console.log(deletedlistings);
-    req.flash("success","Listing Deleted");
-    res.redirect("/listings");
-}))
+//UPDATE ROUTE
+//UPDATE ROUTE
+router.put("/:id",isLoggedIn,validateListing,wrapAsync(listingController.updateListing))
+
+
+//DELETE ROUTE
+router.delete("/:id",isLoggedIn,isOwner,wrapAsync(listingController.destroyListing))
 
 module.exports = router; 

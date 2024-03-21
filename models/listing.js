@@ -31,12 +31,11 @@ const  listingSchema = new Schema({
             ref:"Review",
         }
     ],
-    owner:[
+    owner:
         {
             type:Schema.Types.ObjectId,
             ref:"User" // collection name
         }
-    ]
 });
 
 listingSchema.post('findOneAndDelete', async function (doc, next) {

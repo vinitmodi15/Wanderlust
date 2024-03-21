@@ -42,7 +42,7 @@ app.use(session(sessionOption));
 app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
-passport.use(new LocalStrategy(User.authenticate()))
+passport.use(new LocalStrategy(User.authenticate()))  //The first line (passport.use(new LocalStrategy(User.authenticate()))) is used to set up Passport to use the LocalStrategy for authentication.
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
@@ -50,6 +50,7 @@ passport.deserializeUser(User.deserializeUser());
 app.use((req,res,next)=>{
     res.locals.success = req.flash("success");
     res.locals.error = req.flash("error");
+    //jo bhi user hai ya nhi vo check krne k liye in the navbar and in show.ejs m use kiya hai
     res.locals.currUser = req.user;
     next();
 })
