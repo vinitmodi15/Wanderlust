@@ -8,28 +8,22 @@ const {isLoggedIn,saveRedirectUrl,isOwner,validateListing,validateReview}= requi
 const listingController = require("../controller/listing.js")
 
 
-router.get("/", wrapAsync(listingController.index))
- 
+
+ //all listings and new one
+router.route("/")
+    .get( wrapAsync(listingController.index))
+    .post(isLoggedIn, wrapAsync(listingController.createListings));
+
 //NEW ROUTE
 router.get("/new",isLoggedIn,listingController.renderNewForm)
 
-// SHOW ROUTE 
-router.get("/:id",wrapAsync(listingController.showListings));
 
-
-//UPDATE ROUTE
-router.post("/",isLoggedIn, wrapAsync(listingController.createListings));
-
-
+router.route("/:id")
+    .get(wrapAsync(listingController.showListings))
+    .put(isLoggedIn,validateListing,wrapAsync(listingController.updateListing))
+    .delete(isLoggedIn,isOwner,wrapAsync(listingController.destroyListing));
 //EDIT ROUTE
 router.get("/:id/edit",isLoggedIn,isOwner,wrapAsync(listingController.renderEditForm))
 
-//UPDATE ROUTE
-//UPDATE ROUTE
-router.put("/:id",isLoggedIn,validateListing,wrapAsync(listingController.updateListing))
-
-
-//DELETE ROUTE
-router.delete("/:id",isLoggedIn,isOwner,wrapAsync(listingController.destroyListing))
 
 module.exports = router; 
