@@ -26,7 +26,7 @@ module.exports.showListings =async (req,res)=> {
         // agar url copy kiya va ho and delete krne k baad  m agar vo daale search krne k liye to bada error na aaye isliye yeh flash hojaaye
         res.redirect("/listings")
     }
-    console.log(listing);
+    // console.log(listing);
     // res.send("showing");
     res.render("listings/show.ejs",{listing})
     // console.log(listing);
@@ -34,7 +34,9 @@ module.exports.showListings =async (req,res)=> {
 
 module.exports.createListings = async (req, res) => {
     let newListing = new Listing(req.body.listing);
-
+    let url = req.file.path;
+    let filename = req.file.filename;
+    newListing.image = {url,filename};
     //id of the current user logged in
     newListing.owner = req.user._id;
     await newListing.save();
@@ -51,8 +53,12 @@ module.exports.renderEditForm = async (req,res)=>{
         // agar url copy kiya va ho and delete krne k baad  m agar vo daale search krne k liye to bada error na aaye isliye yeh flash hojaaye
         res.redirect("/listings")
     }
-    // console.log(listing);
-    res.render("listings/edit.ejs",{listing});
+let originalImageUrl = listing.image.url;
+let originalImageUrl1 = originalImageUrl.replace("/upload","/upload/w_250");
+// Ensure that originalImageUrl1 is correctly modified
+console.log(originalImageUrl1);
+    console.log(listing);
+    res.render("listings/edit.ejs",{listing,originalImageUrl1});
 
 }
 
@@ -63,11 +69,15 @@ module.exports.updateListing = async (req,res)=>{
     //     req.flash("error","You are not a authorized person to edit");
     //     return res.redirect("/listings");
     // }   in middleware file i declared for the convenience     
-     let url = req.body.listing.image;
-     let filename = "random";
-    req.body.listing.image = {url,filename};
      let listing1 = req.body.listing;
-    await Listing.findByIdAndUpdate(id,listing1);
+    let listing = await Listing.findByIdAndUpdate(id,listing1); //or findByIdAndUpdate(id,{...req.body.listing});
+
+    if(typeof req.file!=="undefined"){
+    let url = req.file.path;
+    let filename = req.file;
+    listing.image = {url,filename};
+    await listing.save();
+    }
     req.flash("success","Listing Edited Successfully");
     res.redirect(`/listings/${id}`);    
 }
