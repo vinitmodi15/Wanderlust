@@ -15,7 +15,7 @@ const ExpressError = require("./utils/ExpressError.js")
 const { listingSchema, reviewSchema } = require("./JoiSchema.js");
 const Review = require("./models/Review.js");
 const session = require("express-session");
-const MongoStore = require('connect-mongo');    
+const MongoStore = require('connect-mongo');  
 const flash = require("connect-flash")
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
@@ -25,6 +25,19 @@ const listingsRouter = require("./routes/listing.js")
 const reviewRouter = require("./routes/review.js")
 const userRouter = require("./routes/user.js");
 
+let dbUrl = process.env.ATLASDB_URL; //mongoatlas ko iss variable m leke aaye hai 
+main().then(() => {
+    console.log("connected to the DB");
+}).catch((err) => {
+    console.log(err);
+})
+
+async function main() {
+    // await mongoose.connect('mongodb://127.0.0.1:27017/wanderlust');
+    await mongoose.connect(dbUrl);
+   
+}
+
 app.use(express.urlencoded({extended:true}));
 app.set("views engine","ejs");
 app.set("views",path.join(__dirname,"views"));
@@ -32,15 +45,19 @@ app.use(methodOverride("_method"));
 app.engine('ejs',ejsMate);
 app.use(express.static(path.join(__dirname,"/public")))
 
-const store = MongoStore.create({
-    mongoURL:dbUrl,
-    crypto:{
-        secret:process.env.SECRET,
-    },
-    touchAfter: 24*3600,
-})
+
+
+
+
+const store = new MongoStore({
+    mongoUrl: dbUrl, // or mongooseConnection: mongoose.connection
+    secret: process.env.SECRET,
+    touchAfter: 24 * 3600, // Optional: Session touch interval in seconds
+});
+
 
 const sessionOption = {
+    store:store,
     secret:process.env.SECRET, //we cant directly type our secret code here when we are going to deply it so fo that reason we will secure this information
     resave:false,
     saveUninitialized:true,
@@ -60,6 +77,8 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 
+
+
 app.use((req,res,next)=>{
     res.locals.success = req.flash("success");
     res.locals.error = req.flash("error");
@@ -69,23 +88,12 @@ app.use((req,res,next)=>{
 })
 
 
+
 //router object one 
 app.use("/listings",listingsRouter);
 app.use("/listings/:id/reviews",reviewRouter);
 app.use("/",userRouter);
 
-let dbUrl = process.env.ATLASDB_URL; //mongoatlas ko iss variable m leke aaye hai 
-main().then(() => {
-    console.log("connected to the DB");
-}).catch((err) => {
-    console.log(err);
-})
-
-async function main() {
-    // await mongoose.connect('mongodb://127.0.0.1:27017/wanderlust');
-    await mongoose.connect(dbUrl);
-   
-}
 
 // app.get("/demouser",async(req,res)=>{
 //     let fakeUser = new User({
