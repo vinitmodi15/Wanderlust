@@ -1,6 +1,6 @@
 // TO DISPLAY MAP 
 
-mapboxgl.accessToken =mapToken;
+mapboxgl.accessToken =maptoken;
 const map = new mapboxgl.Map({
     container: 'map', // container ID
     center: listing.geometry.coordinates, // starting position [lng, lat]
