@@ -15,6 +15,11 @@
     opacity: 0.7;
 
   }
+  .filter a{
+    text-decoration: none;
+    outline: none;
+    color: black;
+  }
   .filter:hover{
     opacity: 1;
     cursor: pointer;
@@ -36,8 +41,11 @@
 </style>
 <div id="filters">
   <div class="filter ">
-    <i class="fa-solid fa-fire"></i>
-    <p>Trending</p>
+    <a href="/listings/new">
+      <i class="fa-solid fa-fire"></i>
+      <p>Trending</p>
+    </a>
+   
   </div>
   <div class="filter ">
     <i class="fa-solid fa-bed"></i>
