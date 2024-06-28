@@ -17,7 +17,7 @@ const  listingSchema = new Schema({
             //     v===""?"https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fHRyYXZlbHxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60"
             //     :v,
         }
-        // here v is the image value comming from the user if send by the user then it will display that image or the default image will be displayed
+        
     },
     price:Number,
     location: {
@@ -42,18 +42,18 @@ const  listingSchema = new Schema({
             enum: ['Point'], // 'location.type' must be 'Point'
             required: true
         },
-        category: {
-            type: String,
-            required: true,
-            enum: ["Trending", "Rooms", "Iconic cities", "Mountains", "Castles", "Amazing pools", "Camping", "Farms", "Arctic", "Domes", "Boats"]
-        },
+        
         coordinates: {
             type: [Number],
             required: true
         }
-    }
+    },
+    category: {
+        type: String,
+        required: true,
+        enum: ["Trending", "Rooms", "Iconic cities", "Mountains", "Castles", "Amazing pools", "Camping", "Farms", "Arctic", "Domes", "Boats"]
+    },
 });
-
 listingSchema.post('findOneAndDelete', async function (doc, next) {
     // Accessing the reviews field of the document being deleted
     try {

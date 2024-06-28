@@ -11,6 +11,8 @@ const {storage} = require("../cloudinaryConfig.js")//storage ko hum bich m requi
 const upload = multer({storage})
 
 
+router.get("/category", wrapAsync(listingController.filterListings));
+
  //all listings and new one
 router.route("/")
     .get( wrapAsync(listingController.index))
