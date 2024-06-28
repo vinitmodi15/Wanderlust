@@ -16,6 +16,22 @@
                 <label for="description" class="form-label">Description</label>
                 <textarea name="listing[description]" type = "text" class="form-control" required> <%= listing.description %></textarea>
             </div>
+            <div class="mb-3">
+                <label for="category" class="form-label">Category</label>
+                <select name="listing[category]" id="category" class="form-select" aria-label="Multiple select example">
+                    <option value="Trending">Trending</option>
+                    <option value="Rooms">Rooms</option>
+                    <option value="Boats">Boats</option>
+                    <option value="Domes">Domes</option>
+                    <option value="Iconic cities">Iconic cities</option>
+                    <option value="Mountains">Mountains</option>
+                    <option value="Castles">Castles</option>
+                    <option value="Arctic">Arctic</option>
+                    <option value="Camping">Camping</option>
+                    <option value="Amazing pools">Amazing pools</option>
+                    <option value="Farms">Farms</option>
+                </select>
+            </div>
             <div class="mb-3 preview-image">
                 Original Image <br>
                 <img width="200" height="200px" src= "<%=listing.image.url%>">
