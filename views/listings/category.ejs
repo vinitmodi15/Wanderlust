@@ -41,11 +41,8 @@
 </style>
 <div id="filters">
   <div class="filter ">
-    <a href="/listings/new">
       <i class="fa-solid fa-fire"></i>
       <p>Trending</p>
-    </a>
-   
   </div>
   <div class="filter ">
     <i class="fa-solid fa-bed"></i>
@@ -106,7 +103,7 @@
 
 </div>   
     <div class="row row-cols-lg-3 row-cols-md-2 rwo-cols-sm-1 mt-3">
-        <% for(let listings of alllistings){ %>
+        <% for(let listings of allListings){ %>
           <a href="/listings/<%= listings.id%>" class="listing-link">
             <div class="card col listing-card">
                 <img src="<%= listings.image.url%>" class="card-img-top" alt="listing_image"style="height: 20rem;">
@@ -144,7 +141,7 @@
   filters.forEach(filter => {
     filter.addEventListener('click', () => {
         const category = filter.querySelector('p').textContent;
-        window.location.href = /listings/category?filter=${category};
+        window.location.href = `/listings/category?filter=${category}`;
     });
 });
 </script>

@@ -41,10 +41,8 @@
 </style>
 <div id="filters">
   <div class="filter ">
-    <a href="/listings/new">
       <i class="fa-solid fa-fire"></i>
       <p>Trending</p>
-    </a>
    
   </div>
   <div class="filter ">
@@ -144,7 +142,7 @@
   filters.forEach(filter => {
     filter.addEventListener('click', () => {
         const category = filter.querySelector('p').textContent;
-        window.location.href = /listings/category?filter=${category};
+        window.location.href = `/listings/category?filter=${category}`;
     });
 });
 </script>

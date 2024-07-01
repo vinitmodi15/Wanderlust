@@ -109,5 +109,11 @@ module.exports.destroyListing = async (req,res)=>{
 module.exports.filterListings=async(req, res)=>{
     let category=req.query.filter;
     let allListings=await Listing.find({category: category});    
-    res.render("listings/category.ejs", {allListings: allListings, category: category});
+    if(!allListings.length){
+        // res.send("no listing related to this category");
+        req.flash("error","No Listing Related To This Category")
+    } else {
+
+        res.render("listings/category.ejs", {allListings: allListings, category: category});
+    }
 };

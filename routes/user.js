@@ -20,6 +20,7 @@ router.get("/logout",userController.logout)
 
 
 
+
 module.exports = router;
 module.exports.isLoggedIn = isLoggedIn;
 module.exports.saveRedirectUrl = saveRedirectUrl;
