@@ -75,9 +75,7 @@ passport.deserializeUser(User.deserializeUser());
 
 const GoogleStrategy = require("passport-google-oauth").OAuth2Strategy;
 
-// const GOOGLE_CLIENT_ID =
-//   "938279522468-vlr5ke9tv7ueutt4gfiohlbmjdr82e7o.apps.googleusercontent.com";
-// const GOOGLE_CLIENT_SECRET = "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";
+
 
 app.use((req, res, next) => {
   res.locals.success = req.flash("success");
@@ -116,7 +114,7 @@ app.get(
 app.get(
   "/auth/google/callback",
   passport.authenticate("google", { failureRedirect: "/error" }),
-  function (req, res) {
+  (req, res)=> {
     // Successful authentication, redirect success.
     res.redirect("/success");
   }
