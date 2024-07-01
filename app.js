@@ -95,8 +95,8 @@ app.use("/", userRouter);
 passport.use(
   new GoogleStrategy(
     {
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      clientID: process.env.CLIENTID,
+      clientSecret: process.env.CLIENTSECRET,
       callbackURL: "http://localhost:8080/auth/google/callback",
     },
     function (accessToken, refreshToken, profile, done) {
