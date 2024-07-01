@@ -58,4 +58,10 @@ module.exports.logout = (req,res,next)=>{
         }
     })
 }
-
+module.exports.success = (req,res,next)=>{
+    // res.send("hello world");
+    res.redirect("/listings")
+}
+module.exports.failure = (req,res,next)=>{
+    res.send("failure");
+}

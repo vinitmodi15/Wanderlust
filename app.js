@@ -20,6 +20,7 @@ const flash = require("connect-flash");
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const User = require("./models/user.js");
+const GoogleStrategy = require("passport-google-oauth20").Strategy;
 // const {OAuth2Client} = require('google-auth-library');
 
 const listingsRouter = require("./routes/listing.js");
@@ -69,11 +70,58 @@ app.use(session(sessionOption));
 app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
-passport.use(new LocalStrategy(User.authenticate())); //The first line (passport.use(new LocalStrategy(User.authenticate()))) is used to set up Passport to use the LocalStrategy for authentication.
+passport.use(new LocalStrategy(User.authenticate())); 
+// passport.use(
+//   new GoogleStrategy(
+//     {
+//       clientID: process.env.CLIENTID,
+//       clientSecret: process.env.CLIENTSECRET,
+//       callbackURL: "http://localhost:8080/auth/google/callback",
+//     },
+//     async (accessToken, refreshToken, profile, done) => {
+//       try {
+//         // Try to find an existing user by Google ID
+//         let user = await User.findOne({ googleId: profile.id });
+
+//         if (!user) {
+//           // If the user doesn't exist, create a new one
+//           user = new User({
+//             googleId: profile.id,
+//             email: profile.emails[0].value,
+//             name: profile.displayName,
+//           });
+
+//           // Save the new user to the database
+//           await user.save();
+//         }
+
+//         // Pass the user to the done callback
+//         return done(null, user);
+//       } catch (err) {
+//         // Handle any errors that occur
+//         return done(err, null);
+//       }
+//     }
+//   )
+// );
+
+// passport.serializeUser((user, done) => {
+//   done(null, user.id);
+// });
+
+// passport.deserializeUser(async (id, done) => {
+//   try {
+//     const user = await User.findById(id);
+//     done(null, user);
+//   } catch (err) {
+//     done(err, null);
+//   }
+// });
+passport.use(new LocalStrategy(User.authenticate())) //is used to set up Passport to use the LocalStrategy for authentication.
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-const GoogleStrategy = require("passport-google-oauth").OAuth2Strategy;
+// const GoogleStrategy = require("passport-google-oauth").OAuth2Strategy;
 
 
 
@@ -92,36 +140,7 @@ app.use("/", userRouter);
 
 // auth route
 
-passport.use(
-  new GoogleStrategy(
-    {
-      clientID: process.env.CLIENTID,
-      clientSecret: process.env.CLIENTSECRET,
-      callbackURL: "http://localhost:8080/auth/google/callback",
-    },
-    function (accessToken, refreshToken, profile, done) {
-      userProfile = profile;
-      return done(null, userProfile);
-    }
-  )
-);
 
-app.get(
-  "/auth/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
-);
-
-app.get(
-  "/auth/google/callback",
-  passport.authenticate("google", { failureRedirect: "/error" }),
-  (req, res)=> {
-    // Successful authentication, redirect success.
-    res.redirect("/success");
-  }
-);
-app.get("/success",(req,res)=>{
-    res.send("hello world");
-})
 
 // app.get("/demouser",async(req,res)=>{
 //     let fakeUser = new User({
@@ -147,6 +166,9 @@ app.use((err, req, res, next) => {
 app.listen(8080, () => {
   console.log("listening on port 8080");
 });
+
+
+
 
 // app.post("/listings",valida  teListing ,wrapAsync(async(req,res)=>{
 //     // let {title,description,image,price,location,country} = req.body;
