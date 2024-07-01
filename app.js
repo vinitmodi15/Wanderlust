@@ -75,9 +75,9 @@ passport.deserializeUser(User.deserializeUser());
 
 const GoogleStrategy = require("passport-google-oauth").OAuth2Strategy;
 
-const GOOGLE_CLIENT_ID =
-  "938279522468-vlr5ke9tv7ueutt4gfiohlbmjdr82e7o.apps.googleusercontent.com";
-const GOOGLE_CLIENT_SECRET = "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";
+// const GOOGLE_CLIENT_ID =
+//   "938279522468-vlr5ke9tv7ueutt4gfiohlbmjdr82e7o.apps.googleusercontent.com";
+// const GOOGLE_CLIENT_SECRET = "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";
 
 app.use((req, res, next) => {
   res.locals.success = req.flash("success");
@@ -97,8 +97,8 @@ app.use("/", userRouter);
 passport.use(
   new GoogleStrategy(
     {
-      clientID: GOOGLE_CLIENT_ID,
-      clientSecret: GOOGLE_CLIENT_SECRET,
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: "http://localhost:8080/auth/google/callback",
     },
     function (accessToken, refreshToken, profile, done) {
