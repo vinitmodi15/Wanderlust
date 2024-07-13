@@ -9,15 +9,23 @@
          <h3><%=listing.title%></h3>
     </div>
     <div class="card col-6 offset-3 listing-card">
-        <img class="card-img-top show-img " src="<%=listing.image.url%>" alt="Card image cap"  >
+        <img class="card-img-top show-img" src="<%= listing.image.url %>" alt="Card image cap">
         <div class="card-body">
-            <p class="card-text">Owned by-<i><%= listing.owner.username%></i></p>   
-            <p class="card-text"><%=listing.description%> </p> 
-            <p class="card-text">&#8377;<%= listing.price.toLocaleString("en-IN")%> </p>
-            <p class="card-text"><%= listing.country%> <br></p> 
-           <p><class="card-text"><%= listing.location%> <br></p> 
+            <p class="card-text"><b>Owned by-</b><i><%= listing.owner.username %></i></p>   
+            <h5>Description:</h5> 
+            <p class="card-text"><%= listing.description %></p> 
+            <h5>Tarif </h5>
+            <p class="card-text"> &#8377; <%= listing.price.toLocaleString("en-IN") %> <b>Per Night</b></p>
+            <h5>Country</h5>
+            <p class="card-text"><%= listing.country %><br></p>
+            <h5>City</h5> 
+            <p class="card-text"><%= listing.location %><br></p> 
         </div>
+        <form action="/listings/<%= listing.id %>/booknow" method="get">
+            <button class="btn btn-primary mt-3" id="booknow">Book Now</button>
+        </form>
     </div>
+    
 
      <% if(currUser && currUser._id.equals(listing.owner._id)){%>
         <!-- jo bhi user logged in hai kyy uski id or owner ki id match ho rhi hai -->
@@ -100,5 +108,10 @@
 
 <script src="/js/map.js"></script>
 
+<!-- <script>
+    document.getElementById('booknow').addEventListener("click",()=>{
+        window.location.href='/booknow';
+    });
+</script> -->
    
 

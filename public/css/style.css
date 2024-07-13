@@ -28,6 +28,7 @@ body{
 .f-info-links a{
     text-decoration: none;
     color: #222222;
+    padding-right: 1rem;
 }
 .f-info-links a:hover{
     text-decoration: underline;
@@ -116,3 +117,4 @@ body{
    height: 400px;
    width: 100vh;
 }
+

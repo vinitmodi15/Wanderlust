@@ -71,55 +71,58 @@ app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new LocalStrategy(User.authenticate())); 
-// passport.use(
-//   new GoogleStrategy(
-//     {
-//       clientID: process.env.CLIENTID,
-//       clientSecret: process.env.CLIENTSECRET,
-//       callbackURL: "http://localhost:8080/auth/google/callback",
-//     },
-//     async (accessToken, refreshToken, profile, done) => {
-//       try {
-//         // Try to find an existing user by Google ID
-//         let user = await User.findOne({ googleId: profile.id });
 
-//         if (!user) {
-//           // If the user doesn't exist, create a new one
-//           user = new User({
-//             googleId: profile.id,
-//             email: profile.emails[0].value,
-//             name: profile.displayName,
-//           });
-
-//           // Save the new user to the database
-//           await user.save();
-//         }
-
-//         // Pass the user to the done callback
-//         return done(null, user);
-//       } catch (err) {
-//         // Handle any errors that occur
-//         return done(err, null);
-//       }
-//     }
-//   )
-// );
-
-// passport.serializeUser((user, done) => {
-//   done(null, user.id);
-// });
-
-// passport.deserializeUser(async (id, done) => {
-//   try {
-//     const user = await User.findById(id);
-//     done(null, user);
-//   } catch (err) {
-//     done(err, null);
-//   }
-// });
-passport.use(new LocalStrategy(User.authenticate())) //is used to set up Passport to use the LocalStrategy for authentication.
+// passport.use(new LocalStrategy(User.authenticate())) //is used to set up Passport to use the LocalStrategy for authentication.
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID: process.env.CLIENTID,
+      clientSecret: process.env.CLIENTSECRET,
+      callbackURL: "http://localhost:8080/auth/google/callback",
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        // Try to find an existing user by Google ID
+        let username = profile.emails[0].value.split("@")[0];
+        let user = await User.findOne({ googleId: profile.id });
+
+        if (!user) {
+          // If the user doesn't exist, create a new one
+          user = new User({
+            googleId: profile.id,
+            email: profile.emails[0].value,
+            username: username,
+          });
+
+          // Save the new user to the database
+          await user.save();
+        }
+
+        // Pass the user to the done callback
+        return done(null, user);
+      } catch (err) {
+        // Handle any errors that occur
+        return done(err, null);
+      }
+    }
+  )
+);
+
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await User.findById(id);
+    done(null, user);
+  } catch (err) {
+    done(err, null);
+  }
+});
+
 
 // const GoogleStrategy = require("passport-google-oauth").OAuth2Strategy;
 

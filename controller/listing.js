@@ -106,6 +106,10 @@ module.exports.destroyListing = async (req,res)=>{
     req.flash("success","Listing Deleted");
     res.redirect("/listings");
 }
+module.exports.booknow = async(req,res)=>{
+    console.log("hi");
+    res.render("listings/booknow");
+}
 module.exports.filterListings=async(req, res)=>{
     let category=req.query.filter;
     let allListings=await Listing.find({category: category});    
@@ -113,7 +117,6 @@ module.exports.filterListings=async(req, res)=>{
         // res.send("no listing related to this category");
         req.flash("error","No Listing Related To This Category")
     } else {
-
         res.render("listings/category.ejs", {allListings: allListings, category: category});
     }
 };

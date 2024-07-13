@@ -12,8 +12,16 @@
                 <label for="password" class="form-label">Password</label>
                 <input type="password" name="password" placeholder="Enter the password" id="password" class="form-control" required>
             </div>
-            <button class="btn btn-success">Log In</button>
-            <a href="/auth/google" class="btn btn-danger"><span class="fa fa-google"></span> SignIn with Google</a>
+            <div style="display: flex; justify-content: center;">
+                <button class="btn btn-success">Login</button>
+            </div>
+            <p style="text-align: center; margin-top: 1rem;" >Or</p>
+            <div style="display: flex; justify-content: center;">
+                <a href="/auth/google" class="btn btn-danger">
+                    <i class="fab fa-google"></i> <!-- Use 'fab' for FontAwesome brands -->
+                    Sign in with Google
+                </a>
+            </div>
         </form>
     </div>
 </div>    
