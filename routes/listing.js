@@ -31,6 +31,7 @@ router.route("/:id")
     .put(isLoggedIn,isOwner,upload.single('listing[image]'),validateListing,wrapAsync(listingController.updateListing))
     .delete(isLoggedIn,isOwner,wrapAsync(listingController.destroyListing));
 //EDIT ROUTE
-router.get("/:id/edit",isLoggedIn,isOwner,wrapAsync(listingController.renderEditForm))
-router.get('/:id/booknow',isLoggedIn,wrapAsync(listingController.booknow))
+router.get("/:id/edit",isLoggedIn,isOwner,wrapAsync(listingController.renderEditForm));
+router.get('/:id/booknow',isLoggedIn,wrapAsync(listingController.booknow));
+router.post("/submitbooking",isLoggedIn,wrapAsync(listingController.submitlisting));
 module.exports = router; 

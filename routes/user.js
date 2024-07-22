@@ -12,7 +12,6 @@ router.get(
   "/auth/google",
   passport.authenticate("google", { scope: ["profile", "email"] })
 );
-
 router.get(
   "/auth/google/callback",
   passport.authenticate("google", {
@@ -33,7 +32,7 @@ router.route("/login")
   .post(saveRedirectUrl, passport.authenticate('local', { failureRedirect: '/login', failureFlash: true }), userController.login);
 
 router.get("/logout", userController.logout);
-
+router.get("/bookings",isLoggedIn,userController.bookings);
 module.exports = router;
 module.exports.isLoggedIn = isLoggedIn;
 module.exports.saveRedirectUrl = saveRedirectUrl;

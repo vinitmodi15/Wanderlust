@@ -65,3 +65,10 @@ module.exports.success = (req,res,next)=>{
 module.exports.failure = (req,res,next)=>{
     res.send("failure");
 }
+// module.exports.mybookings= async (req,res)=>{
+//     res.send("yr bookings");
+// }
+module.exports.bookings = (req,res)=>{
+    res.send("your bookings");
+    
+}

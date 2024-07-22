@@ -2,7 +2,7 @@ let Listing = require("../models/listing")
 const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
 const maptoken = process.env.MAP_TOKEN;
 const geocodingClient = mbxGeocoding({ accessToken: maptoken });
-
+let Booking = require("../models/booking");
 
 
 module.exports.index = async (req, res) => {
@@ -107,8 +107,9 @@ module.exports.destroyListing = async (req,res)=>{
     res.redirect("/listings");
 }
 module.exports.booknow = async(req,res)=>{
-    console.log("hi");
-    res.render("listings/booknow");
+    // console.log("hi");
+    // res.send("hi")
+    res.render("listings/booknow.ejs");
 }
 module.exports.filterListings=async(req, res)=>{
     let category=req.query.filter;
@@ -119,4 +120,12 @@ module.exports.filterListings=async(req, res)=>{
     } else {
         res.render("listings/category.ejs", {allListings: allListings, category: category});
     }
+}
+module.exports.submitlisting=async(req,res)=>{
+    // res.send("hello");
+    let booking = new Booking(req.body.booking);
+    let savedBooking = await booking.save();
+    console.log(savedBooking);
+    req.flash("success","Booking Created Successfully");
+    res.redirect("/listings");
 };
