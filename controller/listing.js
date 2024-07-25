@@ -124,6 +124,7 @@ module.exports.filterListings=async(req, res)=>{
 module.exports.submitlisting=async(req,res)=>{
     // res.send("hello");
     let booking = new Booking(req.body.booking);
+    booking.userId=req.user._id;
     let savedBooking = await booking.save();
     console.log(savedBooking);
     req.flash("success","Booking Created Successfully");

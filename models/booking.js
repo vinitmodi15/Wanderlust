@@ -39,7 +39,11 @@ const bookingSchema = new mongoose.Schema({
     specialrequest: {
         type: String,
         trim: true
-    }
+    },
+    userId:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"User"
+    },
 });
 
 const Booking = mongoose.model('Booking', bookingSchema);

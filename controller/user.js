@@ -1,8 +1,5 @@
 const User = require("../models/user");
-
-
-
-
+const Booking = require("../models/booking")
 module.exports.renderSignupForm = (req,res)=>{
     // res.send("form");
     res.render("users/signup.ejs");
@@ -68,7 +65,15 @@ module.exports.failure = (req,res,next)=>{
 // module.exports.mybookings= async (req,res)=>{
 //     res.send("yr bookings");
 // }
-module.exports.bookings = (req,res)=>{
-    res.send("your bookings");
-    
-}
+// const Booking = require('../models/booking.js'); // Adjust the path as needed
+
+module.exports.bookings = async (req, res) => {
+    try {
+        let userBookings = await Booking.find({ userId: req.user._id });
+        console.log(userBookings);
+        res.render('users/booking.ejs', { userBookings });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+};

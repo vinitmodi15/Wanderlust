@@ -1,0 +1,77 @@
+<% layout('/layouts/boilerplate') -%>
+<style>
+    body{
+        text-align: center;
+    }
+
+    table{
+        margin: 10px auto;
+    }
+    table,
+    th,
+    td {
+        background-color: rgb(127, 217, 255);
+        border: 3px solid white;
+        border-collapse: collapse;
+    }
+
+    th,
+    td {
+        padding: 5px;
+    }
+</style>
+    <div>
+        <% if (userBookings.length > 0) { %>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>E-mail</th>
+                <th>Check in time</th>
+                <th>Check out time</th>
+                <th>Rooms</th>
+                <th>No of adults</th>
+                <th>No of children</th>
+                <th>Special Request.</th>     
+            </tr>
+            <% } %>
+            <% if (userBookings.length > 0) { %>
+                <% for(booking of userBookings){%>
+                    <tr>
+                        <td>
+                            <%= booking.name %>
+                        </td>
+                        <td>
+                            <%= booking.email %>
+                        </td>
+                        <td>
+                            <%=booking.checkIn%>
+                        </td>
+                        <td>
+                            <%=booking.checkOut%>
+                        </td>
+                        <td>
+                            <%=booking.rooms%>
+                        </td>
+                        <td>
+                            <%=booking.adults%>
+                        </td>
+                        <td>
+                            <%=booking.children%>
+                        </td>
+                        <td>
+                            <%=booking.specialrequest%>
+                        </td>
+                    
+                    </tr>
+                    <% } %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="8"><b>Please make a new booking</b></td>
+                        <!-- <button onclick=""></button> -->
+                         <br><br>
+                        <button onclick="window.location.href='/listings'" class="btn btn-success mt-3">Go to Listings Page</button>
+
+                    </tr>
+                <% } %>
+        </table>
+    </div>
